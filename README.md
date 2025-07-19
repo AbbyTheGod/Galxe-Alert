@@ -1,26 +1,26 @@
 # Galxe Quest Monitor Bot 🤖
 
-A fully automated Telegram bot that monitors Galxe quest pages for specific projects (like D3, T-REXNetwork, Arbitrum, Polygon, Optimism, etc.) and sends new quest notifications to a Telegram channel.
+A fully automated Telegram bot that monitors Galxe quest pages for specific projects and sends new quest notifications to a Telegram channel.
 
 ## Features ✨
 
-- 🔍 **Automated Monitoring**: Continuously monitors multiple Galxe project pages
-- 📱 **Telegram Notifications**: Sends formatted quest alerts with direct links
+- 🔍 **Automated Monitoring**: Continuously monitors multiple Galxe project pages every 5 minutes
+- 📱 **Telegram Notifications**: Sends direct quest links only (clean format)
 - 🗄️ **Database Storage**: Tracks quests to avoid duplicate notifications
-- 🖼️ **Rich Media Support**: Includes quest images when available
-- ⚡ **Smart Scraping**: Uses both requests and Selenium for dynamic content
-- 🔄 **Configurable Intervals**: Customizable monitoring frequency
-- 📊 **Error Handling**: Robust error handling with Telegram alerts
+- ⚡ **Smart Scraping**: Uses Selenium for dynamic content handling
+- 🔄 **Fast Response**: Checks every 5 minutes for maximum responsiveness
+- 📊 **Error Handling**: Robust error handling with logging
 - 🛡️ **Rate Limiting**: Respectful scraping with delays between requests
 
 ## Supported Projects 🎯
 
 Currently monitoring:
-- **D3** - https://galxe.com/D3
-- **T-REXNetwork** - https://galxe.com/T-REXNetwork
-- **Arbitrum** - https://galxe.com/arbitrum
-- **Polygon** - https://galxe.com/polygon
-- **Optimism** - https://galxe.com/optimism
+- **D3** - https://app.galxe.com/quest/D3
+- **T-REXNetwork** - https://app.galxe.com/quest/T-REXNetwork
+- **Fleek** - https://app.galxe.com/quest/fleek
+- **Rayls** - https://app.galxe.com/quest/rayls
+- **zkVerify** - https://app.galxe.com/quest/zkverify
+- **Mawari** - https://app.galxe.com/quest/mawari
 
 *Easy to add more projects in the configuration!*
 
@@ -35,8 +35,8 @@ Currently monitoring:
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd galxe-quest-bot
+   git clone https://github.com/AbbyTheGod/Galxe-Alert.git
+   cd Galxe-Alert
    ```
 
 2. **Install dependencies**
@@ -50,7 +50,8 @@ Currently monitoring:
    cp env_example.txt .env
    
    # Edit .env with your credentials
-   nano .env
+   # On Windows: notepad .env
+   # On Mac/Linux: nano .env
    ```
 
 4. **Configure your bot**
@@ -68,10 +69,13 @@ Create a `.env` file with the following variables:
 # Telegram Bot Configuration
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
 TELEGRAM_CHANNEL_ID=@your_channel_username_or_id
-
-# Optional: Override default scraping interval (in minutes)
-SCRAPING_INTERVAL_MINUTES=30
 ```
+
+### Current Settings
+
+- **Scraping Interval**: Every 5 minutes
+- **Notification Format**: Direct quest links only
+- **Projects Monitored**: 6 projects (D3, T-REXNetwork, Fleek, Rayls, zkVerify, Mawari)
 
 ### Adding New Projects
 
@@ -81,8 +85,8 @@ Edit `config.py` to add more projects:
 PROJECTS = {
     'YourProject': {
         'name': 'YourProject',
-        'url': 'https://galxe.com/YourProject',
-        'quest_url': 'https://galxe.com/YourProject/campaigns'
+        'url': 'https://app.galxe.com/quest/YourProject',
+        'quest_url': 'https://app.galxe.com/quest/YourProject'
     },
     # ... existing projects
 }
@@ -90,59 +94,71 @@ PROJECTS = {
 
 ## Usage 🎮
 
-### Running the Bot
+### Quick Start
 
 ```bash
+# Run the bot directly
 python main.py
+
+# Or use the helper script (Windows)
+start_bot.bat
+
+# Or use the Python runner
+python run_bot.py
 ```
 
-The bot will:
-1. Initialize the database
-2. Test Telegram connection
-3. Send a startup message
-4. Begin monitoring quest pages
-5. Send notifications for new quests
+### Testing
 
-### Bot Commands
+```bash
+# Test all components
+python test_bot.py
 
-The bot automatically sends:
-- **Startup Message**: Confirms the bot is running
-- **Quest Notifications**: New quest alerts with project info and direct links
-- **Error Alerts**: When issues occur during monitoring
-- **Status Updates**: Periodic status reports (can be implemented)
+# Test Telegram notifications
+python test_telegram_notifications.py
 
-## Project Structure 📁
-
-```
-galxe-quest-bot/
-├── main.py              # Main bot script
-├── config.py            # Configuration settings
-├── database.py          # Database operations
-├── scraper.py           # Web scraping functionality
-├── telegram_bot.py      # Telegram bot interface
-├── requirements.txt     # Python dependencies
-├── env_example.txt      # Environment variables example
-├── README.md           # This file
-└── quests.db           # SQLite database (created automatically)
+# Debug scraper
+python debug_scraper.py
 ```
 
 ## How It Works 🔧
 
 1. **Initialization**: Bot sets up database and loads project configurations
-2. **Monitoring Loop**: Checks each project's quest page at regular intervals
+2. **Monitoring Loop**: Checks each project's quest page every 5 minutes
 3. **Web Scraping**: Uses Selenium to handle dynamic content on Galxe
 4. **Quest Detection**: Extracts quest information using multiple selectors
 5. **Database Storage**: Stores new quests and tracks notification status
-6. **Telegram Notifications**: Sends formatted messages with quest details
-7. **Error Handling**: Logs errors and sends alerts for critical issues
+6. **Telegram Notifications**: Sends direct quest links only
+7. **Error Handling**: Logs errors and continues monitoring
 
-## Database Schema 🗄️
+## Project Structure 📁
 
-The bot uses SQLite with three main tables:
+```
+Galxe-Alert/
+├── main.py                      # Main bot script
+├── config.py                    # Configuration settings
+├── database.py                  # Database operations
+├── scraper.py                   # Web scraping functionality
+├── telegram_bot.py              # Telegram bot interface
+├── test_bot.py                  # Component testing
+├── test_telegram_notifications.py # Telegram notification testing
+├── debug_scraper.py             # Scraper debugging
+├── run_bot.py                   # Bot runner with checks
+├── start_bot.bat                # Windows batch file
+├── requirements.txt             # Python dependencies
+├── env_example.txt              # Environment variables example
+├── .gitignore                   # Git ignore file
+├── README.md                    # This file
+└── quests.db                    # SQLite database (created automatically)
+```
 
-- **quests**: Stores quest information and metadata
-- **projects**: Tracks monitored projects and their URLs
-- **notifications**: Records sent notifications to avoid duplicates
+## Notification Format 📱
+
+The bot sends clean, simple notifications:
+```
+https://galxe.com/quest/ProjectName/QuestID
+```
+
+Just the direct link - no extra text, no project names, no metadata.
 
 ## Customization 🎨
 
@@ -150,28 +166,16 @@ The bot uses SQLite with three main tables:
 
 Edit `config.py`:
 ```python
-SCRAPING_INTERVAL_MINUTES = 15  # Check every 15 minutes
+SCRAPING_INTERVAL_MINUTES = 10  # Check every 10 minutes
 ```
 
-### Modifying Quest Message Format
+### Modifying Notification Format
 
 Edit `telegram_bot.py` in the `_format_quest_message` method:
 ```python
 def _format_quest_message(self, quest_data):
-    # Customize your message format here
-    message = f"🎯 New Quest: {quest_data['quest_title']}"
-    return message
-```
-
-### Adding More Scraping Selectors
-
-Edit `scraper.py` to add more CSS selectors for quest detection:
-```python
-quest_selectors = [
-    '[data-testid="campaign-card"]',
-    '.campaign-card',
-    '.your-custom-selector',  # Add your selectors here
-]
+    quest_url = quest_data.get('quest_url', '')
+    return quest_url  # Just the URL
 ```
 
 ## Troubleshooting 🔧
@@ -189,48 +193,35 @@ quest_selectors = [
 3. **Selenium Errors**
    - Ensure Chrome is installed
    - Update Chrome to the latest version
-   - Check if ChromeDriver is compatible
+   - ChromeDriver is automatically managed
 
 4. **No Quests Found**
    - Galxe may have changed their HTML structure
    - Check the logs for scraping errors
-   - Update selectors in `scraper.py`
+   - Run `python debug_scraper.py` to test scraping
 
 ### Logs
 
-Check the `bot.log` file for detailed information:
-```bash
-tail -f bot.log
-```
+Check the console output for detailed information. The bot logs all activities.
 
-## Contributing 🤝
+## Features Summary 🎯
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License 📄
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Disclaimer ⚠️
-
-This bot is for educational and personal use. Please:
-- Respect Galxe's terms of service
-- Use reasonable scraping intervals
-- Don't overload their servers
-- Monitor your bot's behavior
+- ✅ **5-minute monitoring intervals**
+- ✅ **Direct quest links only**
+- ✅ **No duplicate notifications**
+- ✅ **6 projects monitored**
+- ✅ **Automatic ChromeDriver management**
+- ✅ **Robust error handling**
+- ✅ **Easy configuration**
 
 ## Support 💬
 
 If you encounter issues:
 1. Check the troubleshooting section
-2. Review the logs
-3. Open an issue on GitHub
-4. Provide detailed error information
+2. Review the console logs
+3. Run the test scripts
+4. Open an issue on GitHub
 
 ---
 
-**Happy Quest Hunting! 🚀** 
+**Ready to catch those new quests! 🚀** 
