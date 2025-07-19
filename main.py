@@ -51,18 +51,23 @@ class GalxeQuestBot:
     
     async def start(self):
         """Start the bot"""
-        logger.info("Starting Galxe Quest Monitor Bot...")
+        logger.info("🚀 Starting Galxe Quest Monitor Bot...")
+        logger.info(f"📊 Monitoring {len(PROJECTS)} projects: {', '.join([p['name'] for p in PROJECTS.values()])}")
+        logger.info(f"⏰ Check interval: {SCRAPING_INTERVAL_MINUTES} minutes")
         
         # Test Telegram connection
+        logger.info("📱 Testing Telegram connection...")
         if not await self.telegram_bot.test_connection():
-            logger.error("Failed to connect to Telegram. Check your bot token.")
+            logger.error("❌ Failed to connect to Telegram. Check your bot token.")
             return False
+        logger.info("✅ Telegram connection successful!")
         
         # Send startup message
+        logger.info("📤 Sending startup message to Telegram...")
         await self.telegram_bot.send_test_message()
         
         self.is_running = True
-        logger.info("Bot started successfully!")
+        logger.info("🎉 Bot started successfully and ready to monitor!")
         
         # Start monitoring
         await self.monitor_quests()
@@ -71,61 +76,85 @@ class GalxeQuestBot:
     
     async def monitor_quests(self):
         """Main monitoring loop"""
-        logger.info("Starting quest monitoring...")
+        logger.info("🔍 Starting quest monitoring loop...")
+        check_count = 0
         
         while self.is_running:
             try:
+                check_count += 1
+                logger.info(f"🔄 Starting check #{check_count} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                
                 await self._check_all_projects()
                 
                 # Wait for next check
-                logger.info(f"Waiting {SCRAPING_INTERVAL_MINUTES} minutes until next check...")
+                next_check = datetime.now() + timedelta(minutes=SCRAPING_INTERVAL_MINUTES)
+                logger.info(f"⏳ Next check scheduled for: {next_check.strftime('%Y-%m-%d %H:%M:%S')}")
+                logger.info(f"😴 Sleeping for {SCRAPING_INTERVAL_MINUTES} minutes...")
                 await asyncio.sleep(SCRAPING_INTERVAL_MINUTES * 60)
                 
             except KeyboardInterrupt:
-                logger.info("Received interrupt signal, stopping bot...")
+                logger.info("🛑 Received interrupt signal, stopping bot...")
                 self.is_running = False
                 break
             except Exception as e:
-                logger.error(f"Error in monitoring loop: {e}")
+                logger.error(f"❌ Error in monitoring loop: {e}")
                 await self.telegram_bot.send_error_message(str(e))
+                logger.info("⏰ Waiting 1 minute before retrying...")
                 await asyncio.sleep(60)  # Wait 1 minute before retrying
     
     async def _check_all_projects(self):
         """Check all projects for new quests"""
-        logger.info("Checking all projects for new quests...")
+        logger.info("🔍 Checking all projects for new quests...")
         
         new_quests_found = 0
+        total_quests_scraped = 0
         
         with GalxeScraper() as scraper:
             self.scraper = scraper
+            logger.info("🌐 Web scraper initialized successfully")
             
-            for project_key, project_data in PROJECTS.items():
+            for i, (project_key, project_data) in enumerate(PROJECTS.items(), 1):
                 try:
+                    logger.info(f"📋 [{i}/{len(PROJECTS)}] Processing project: {project_data['name']}")
+                    
                     await self._check_project(project_data)
-                    new_quests_found += await self._process_new_quests(project_data['name'])
+                    project_new_quests = await self._process_new_quests(project_data['name'])
+                    new_quests_found += project_new_quests
+                    
+                    if project_new_quests > 0:
+                        logger.info(f"🎉 Found {project_new_quests} new quests for {project_data['name']}")
+                    else:
+                        logger.info(f"✅ No new quests for {project_data['name']}")
                     
                     # Small delay between projects to be respectful
-                    await asyncio.sleep(2)
+                    if i < len(PROJECTS):  # Don't delay after the last project
+                        logger.info("⏱️ Waiting 2 seconds before next project...")
+                        await asyncio.sleep(2)
                     
                 except Exception as e:
-                    logger.error(f"Error checking project {project_data['name']}: {e}")
+                    logger.error(f"❌ Error checking project {project_data['name']}: {e}")
                     await self.telegram_bot.send_error_message(f"Error checking {project_data['name']}: {str(e)}")
         
+        # Summary
         if new_quests_found > 0:
-            logger.info(f"Found {new_quests_found} new quests across all projects")
+            logger.info(f"🎊 SUMMARY: Found {new_quests_found} new quests across all projects!")
         else:
-            logger.info("No new quests found")
+            logger.info("📭 SUMMARY: No new quests found in this check")
+        
+        logger.info(f"📊 Check completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     async def _check_project(self, project_data):
         """Check a single project for new quests"""
         project_name = project_data['name']
         quest_url = project_data['quest_url']
         
-        logger.info(f"Checking project: {project_name}")
+        logger.info(f"🌐 Scraping quests from: {quest_url}")
         
         # Scrape quests from the project page
         quests = self.scraper.scrape_quests(project_name, quest_url)
+        logger.info(f"📄 Found {len(quests)} quests on {project_name} page")
         
+        new_quests_added = 0
         # Add new quests to database
         for quest in quests:
             if not self.db.quest_exists(quest['quest_url']):
@@ -137,17 +166,30 @@ class GalxeQuestBot:
                     quest.get('quest_image')
                 )
                 if success:
-                    logger.info(f"Added new quest: {quest['quest_title']} for {project_name}")
+                    new_quests_added += 1
+                    logger.info(f"➕ Added new quest to database: {quest['quest_title'][:50]}...")
+        
+        if new_quests_added > 0:
+            logger.info(f"💾 Added {new_quests_added} new quests to database for {project_name}")
+        else:
+            logger.info(f"📝 No new quests to add for {project_name}")
         
         # Update last checked timestamp
         self.db.update_project_last_checked(project_name)
+        logger.info(f"⏰ Updated last check timestamp for {project_name}")
     
     async def _process_new_quests(self, project_name):
         """Process and send notifications for new quests"""
         new_quests = self.db.get_new_quests(project_name)
+        
+        if not new_quests:
+            logger.info(f"📭 No new quests to process for {project_name}")
+            return 0
+        
+        logger.info(f"📤 Processing {len(new_quests)} new quests for {project_name}")
         sent_count = 0
         
-        for quest in new_quests:
+        for i, quest in enumerate(new_quests, 1):
             try:
                 # Convert database row to dict
                 quest_data = {
@@ -159,6 +201,8 @@ class GalxeQuestBot:
                     'discovered_at': quest[8]
                 }
                 
+                logger.info(f"📨 [{i}/{len(new_quests)}] Sending notification for: {quest_data['quest_title'][:50]}...")
+                
                 # Send notification
                 success = await self.telegram_bot.send_quest_notification(quest_data)
                 
@@ -166,14 +210,19 @@ class GalxeQuestBot:
                     # Mark as notified
                     self.db.mark_quest_notified(quest[0])
                     sent_count += 1
-                    logger.info(f"Sent notification for quest: {quest_data['quest_title']}")
+                    logger.info(f"✅ Successfully sent notification for quest: {quest_data['quest_title'][:50]}...")
+                else:
+                    logger.error(f"❌ Failed to send notification for quest: {quest_data['quest_title'][:50]}...")
                 
                 # Small delay between notifications
-                await asyncio.sleep(1)
+                if i < len(new_quests):  # Don't delay after the last notification
+                    logger.info("⏱️ Waiting 1 second before next notification...")
+                    await asyncio.sleep(1)
                 
             except Exception as e:
-                logger.error(f"Error processing quest notification: {e}")
+                logger.error(f"❌ Error processing quest notification: {e}")
         
+        logger.info(f"📊 Sent {sent_count}/{len(new_quests)} notifications for {project_name}")
         return sent_count
     
     async def send_status_report(self):
@@ -196,33 +245,43 @@ class GalxeQuestBot:
     
     def stop(self):
         """Stop the bot"""
-        logger.info("Stopping bot...")
+        logger.info("🛑 Stopping Galxe Quest Monitor Bot...")
         self.is_running = False
         if self.scraper:
+            logger.info("🔧 Closing web scraper...")
             self.scraper.close_selenium()
+        logger.info("👋 Bot stopped successfully!")
 
 async def main():
     """Main function"""
+    logger.info("🎯 Galxe Quest Monitor Bot - Starting up...")
+    logger.info("=" * 60)
+    
     # Validate configuration
     if not TELEGRAM_BOT_TOKEN:
-        logger.error("TELEGRAM_BOT_TOKEN not set in environment variables")
+        logger.error("❌ TELEGRAM_BOT_TOKEN not set in environment variables")
         return
     
     if not TELEGRAM_CHANNEL_ID:
-        logger.error("TELEGRAM_CHANNEL_ID not set in environment variables")
+        logger.error("❌ TELEGRAM_CHANNEL_ID not set in environment variables")
         return
     
+    logger.info("✅ Environment variables validated successfully")
+    
     # Create and start bot
+    logger.info("🔧 Initializing bot components...")
     bot = GalxeQuestBot()
     
     try:
         await bot.start()
     except KeyboardInterrupt:
-        logger.info("Bot interrupted by user")
+        logger.info("🛑 Bot interrupted by user (Ctrl+C)")
     except Exception as e:
-        logger.error(f"Bot error: {e}")
+        logger.error(f"❌ Bot error: {e}")
     finally:
         bot.stop()
+        logger.info("=" * 60)
+        logger.info("👋 Bot shutdown complete")
 
 if __name__ == "__main__":
     # Run the bot
