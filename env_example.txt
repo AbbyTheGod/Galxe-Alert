@@ -1,0 +1,11 @@
+# Telegram Bot Configuration
+# Get your bot token from @BotFather on Telegram
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+
+# Telegram Channel ID where notifications will be sent
+# For public channels: @channel_username
+# For private channels: -1001234567890 (get this by forwarding a message from your channel to @userinfobot)
+TELEGRAM_CHANNEL_ID=@your_channel_username_or_id
+
+# Optional: Override default scraping interval (in minutes)
+# SCRAPING_INTERVAL_MINUTES=30 
