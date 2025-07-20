@@ -39,11 +39,56 @@ PROJECTS = {
         'name': 'Mawari',
         'url': 'https://app.galxe.com/quest/mawari',
         'quest_url': 'https://app.galxe.com/quest/mawari'
+    },
+    'OP_NET': {
+        'name': 'OP_NET',
+        'url': 'https://app.galxe.com/quest/OP_NET',
+        'quest_url': 'https://app.galxe.com/quest/OP_NET'
+    },
+    'Irys': {
+        'name': 'Irys',
+        'url': 'https://app.galxe.com/quest/Irys',
+        'quest_url': 'https://app.galxe.com/quest/Irys'
+    },
+    'DonutBrowser': {
+        'name': 'Donut Browser',
+        'url': 'https://app.galxe.com/quest/Donut%20Browser',
+        'quest_url': 'https://app.galxe.com/quest/Donut%20Browser'
+    },
+    'LitProtocol': {
+        'name': 'Lit Protocol',
+        'url': 'https://app.galxe.com/quest/Lit%20Protocol',
+        'quest_url': 'https://app.galxe.com/quest/Lit%20Protocol'
+    },
+    'KarrierOne': {
+        'name': 'KarrierOne',
+        'url': 'https://app.galxe.com/quest/KarrierOne',
+        'quest_url': 'https://app.galxe.com/quest/KarrierOne'
+    },
+    'Genlayer': {
+        'name': 'Genlayer',
+        'url': 'https://app.galxe.com/quest/Genlayer',
+        'quest_url': 'https://app.galxe.com/quest/Genlayer'
+    },
+    'plasma': {
+        'name': 'plasma',
+        'url': 'https://app.galxe.com/quest/plasma',
+        'quest_url': 'https://app.galxe.com/quest/plasma'
+    },
+    'dango': {
+        'name': 'dango',
+        'url': 'https://app.galxe.com/quest/dango',
+        'quest_url': 'https://app.galxe.com/quest/dango'
+    },
+    'ducat': {
+        'name': 'ducat',
+        'url': 'https://app.galxe.com/quest/ducat',
+        'quest_url': 'https://app.galxe.com/quest/ducat'
     }
 }
 
 # Scraping Configuration
-SCRAPING_INTERVAL_MINUTES = 5  # Check every 5 minutes
+SCRAPING_INTERVAL_MINUTES = 30  # Check every 30 minutes
 REQUEST_DELAY = 2  # Delay between requests in seconds
 MAX_RETRIES = 3
 
