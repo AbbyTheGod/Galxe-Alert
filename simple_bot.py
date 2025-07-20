@@ -61,6 +61,8 @@ def extract_quests(project):
         soup = BeautifulSoup(driver.page_source, 'html.parser')
 
         quest_cards = soup.select('[data-testid="campaign-card"], [data-testid="quest-card"], .card, a[href*="/campaign/"], a[href*="/quest/"]')
+        print(f"[📊] Found {len(quest_cards)} quest cards for {project}")
+        
         for card in quest_cards:
             try:
                 title = card.get_text(strip=True)
@@ -77,8 +79,10 @@ def extract_quests(project):
                 print(f"[✓] Sent new quest: {title[:50]}...")
             except Exception as e:
                 print(f"[!] failed to process card: {e}")
+        print(f"[✅] Finished checking {project}")
     except Exception as e:
-        print(f"[!] failed to load {project}: {e}")
+        print(f"[❌] failed to load {project}: {e}")
+        print(f"[🔧] Continuing with next project...")
 
 
 
@@ -91,12 +95,26 @@ if __name__ == '__main__':
     
     try:
         while True:
-            for project in PROJECTS:
-                extract_quests(project)
-                time.sleep(2)  # Small delay between projects
-            print(f"😴 Sleeping for 30 minutes... Next check at {time.strftime('%H:%M:%S')}")
+            print(f"\n🔄 Starting new cycle at {time.strftime('%H:%M:%S')}")
+            for i, project in enumerate(PROJECTS, 1):
+                try:
+                    print(f"\n[{i}/{len(PROJECTS)}] Processing {project}...")
+                    extract_quests(project)
+                    time.sleep(2)  # Small delay between projects
+                    print(f"[✅] Completed {project} ({i}/{len(PROJECTS)})")
+                except Exception as e:
+                    print(f"[❌] Error processing {project}: {e}")
+                    print(f"[🔧] Continuing with next project...")
+                    continue
+            
+            print(f"\n😴 Completed all {len(PROJECTS)} projects. Sleeping for 30 minutes... Next check at {time.strftime('%H:%M:%S')}")
             time.sleep(1800)  # 30 minutes
     except KeyboardInterrupt:
         print("\n🛑 Shutting down...")
         driver.quit()
-        conn.close() 
+        conn.close()
+    except Exception as e:
+        print(f"\n[💥] Critical error in main loop: {e}")
+        print("🔄 Restarting in 60 seconds...")
+        time.sleep(60)
+        # You could add a restart mechanism here 
