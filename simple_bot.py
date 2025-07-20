@@ -16,7 +16,7 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 # Projects to monitor
-PROJECTS = ['D3', 'T-REXNetwork', 'Fleek', 'Rayls', 'zkVerify', 'Mawari', 'OP_NET', 'Irys', 'Donut Browser', 'Lit Protocol', 'KarrierOne', 'Genlayer', 'plasma', 'dango', 'ducat']
+PROJECTS = ['D3', 'T-REXNetwork', 'Fleek', 'Rayls', 'zkVerify', 'Mawari', 'OP_NET', 'Irys', 'DonutBrowser', 'LitProtocol', 'KarrierOne', 'Genlayer', 'plasma', 'dango', 'ducat']
 
 # telegram bot setup
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
@@ -53,8 +53,15 @@ def save_quest(url):
     conn.commit()
 
 def extract_quests(project):
-    base_url = f"https://app.galxe.com/quest/{project}"
-    print(f"[→] checking: {project}")
+    # Handle different URL formats
+    if project == 'DonutBrowser':
+        base_url = "https://app.galxe.com/quest/Donut%20Browser"
+    elif project == 'LitProtocol':
+        base_url = "https://app.galxe.com/quest/Lit%20Protocol"
+    else:
+        base_url = f"https://app.galxe.com/quest/{project}"
+    
+    print(f"[→] checking: {project} at {base_url}")
     try:
         driver.get(base_url)
         time.sleep(5)  # wait for JavaScript content to load
