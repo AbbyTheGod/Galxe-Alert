@@ -16,7 +16,7 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 # Projects to monitor
-PROJECTS = ['D3', 'T-REXNetwork', 'Fleek', 'Rayls', 'zkVerify', 'Mawari', 'OP_NET', 'Irys', 'DonutBrowser', 'LitProtocol', 'KarrierOne', 'Genlayer', 'plasma', 'dango', 'ducat']
+PROJECTS = ['D3', 'T-REXNetwork', 'Fleek', 'Rayls', 'zkVerify', 'Mawari', 'WDKbxYkaZdwzc2f54sVSeb', 'Irys', 'DonutBrowser', 'LitProtocol', 'KarrierOne', 'Genlayer', 'plasma', 'dango', 'ducat']
 
 # telegram bot setup
 bot = Bot(token=TELEGRAM_BOT_TOKEN)

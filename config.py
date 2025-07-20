@@ -40,10 +40,10 @@ PROJECTS = {
         'url': 'https://app.galxe.com/quest/mawari',
         'quest_url': 'https://app.galxe.com/quest/mawari'
     },
-    'OP_NET': {
-        'name': 'OP_NET',
-        'url': 'https://app.galxe.com/quest/OP_NET',
-        'quest_url': 'https://app.galxe.com/quest/OP_NET'
+    'WDKbxYkaZdwzc2f54sVSeb': {
+        'name': 'WDKbxYkaZdwzc2f54sVSeb',
+        'url': 'https://app.galxe.com/quest/WDKbxYkaZdwzc2f54sVSeb',
+        'quest_url': 'https://app.galxe.com/quest/WDKbxYkaZdwzc2f54sVSeb'
     },
     'Irys': {
         'name': 'Irys',
