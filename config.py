@@ -84,20 +84,30 @@ PROJECTS = {
         'name': 'ducat',
         'url': 'https://app.galxe.com/quest/ducat',
         'quest_url': 'https://app.galxe.com/quest/ducat'
+    },
+    'RHAjhS7dAR4mp34QC8DXsG': {
+        'name': 'RHAjhS7dAR4mp34QC8DXsG',
+        'url': 'https://app.galxe.com/quest/RHAjhS7dAR4mp34QC8DXsG',
+        'quest_url': 'https://app.galxe.com/quest/RHAjhS7dAR4mp34QC8DXsG'
+    },
+    '5pH5qUCoxjtXdLh2XMpRKT': {
+        'name': '5pH5qUCoxjtXdLh2XMpRKT',
+        'url': 'https://app.galxe.com/quest/5pH5qUCoxjtXdLh2XMpRKT',
+        'quest_url': 'https://app.galxe.com/quest/5pH5qUCoxjtXdLh2XMpRKT'
     }
 }
 
 # Scraping Configuration
-SCRAPING_INTERVAL_MINUTES = 30  # Check every 30 minutes
+SCRAPING_INTERVAL_MINUTES = int(os.getenv('SCRAPING_INTERVAL_MINUTES', 30))  # Check every 30 minutes (configurable via env)
 REQUEST_DELAY = 2  # Delay between requests in seconds
 MAX_RETRIES = 3
 
 # Database Configuration
-DATABASE_PATH = 'quests.db'
+DATABASE_PATH = os.getenv('DATABASE_PATH', 'quests.db')
 
 # User Agent for web requests
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 
 # Logging Configuration
-LOG_LEVEL = 'INFO'
-LOG_FILE = 'bot.log' 
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+LOG_FILE = os.getenv('LOG_FILE', 'bot.log') 
